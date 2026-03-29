@@ -4,17 +4,7 @@ import { useState } from "react";
 import { BarChart2, TrendingUp, Zap, AlertCircle } from "lucide-react";
 import ChannelSearch from "./ChannelSearch";
 import ChannelResults from "./ChannelResults";
-
-interface ChannelData {
-  name: string;
-  handle: string;
-  subscribers: string;
-  totalViews: string;
-  videoCount: string;
-  avatar: string;
-  banner: string;
-  videos: any[];
-}
+import type { ChannelData } from "./results";
 
 type View = "hero" | "entering" | "results" | "leaving";
 
@@ -39,54 +29,30 @@ const FEATURES = [
   },
 ];
 
-const BASE: React.CSSProperties = {
-  minHeight: "100vh",
-  backgroundColor: "#060e1a",
-  color: "#e2e8f0",
-  fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-  overflowX: "hidden",
-  position: "relative",
-};
-
 /** Shared dark grid + glow background layer */
 function Background() {
   return (
     <>
       <div
+        className="absolute inset-0 pointer-events-none"
         style={{
-          position: "absolute",
-          inset: 0,
-          pointerEvents: "none",
           backgroundImage:
             "linear-gradient(rgba(56,189,248,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(56,189,248,0.05) 1px, transparent 1px)",
           backgroundSize: "48px 48px",
         }}
       />
       <div
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] rounded-full pointer-events-none"
         style={{
-          position: "absolute",
-          top: 0,
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: 800,
-          height: 500,
-          borderRadius: "50%",
           background:
             "radial-gradient(ellipse, rgba(6,182,212,0.08) 0%, transparent 70%)",
-          pointerEvents: "none",
         }}
       />
       <div
+        className="absolute top-20 left-[20%] w-80 h-80 rounded-full pointer-events-none"
         style={{
-          position: "absolute",
-          top: 80,
-          left: "20%",
-          width: 320,
-          height: 320,
-          borderRadius: "50%",
           background:
             "radial-gradient(ellipse, rgba(37,99,235,0.07) 0%, transparent 70%)",
-          pointerEvents: "none",
         }}
       />
     </>
@@ -101,11 +67,9 @@ export default function HeroSection() {
 
   const handleResults = (data: ChannelData) => {
     setResults(data);
-    // Trigger slide-out of hero, then swap to results view
     setView("leaving");
     setTimeout(() => {
       setView("entering");
-      // Small tick to let "entering" state paint before animating in
       requestAnimationFrame(() =>
         requestAnimationFrame(() => setView("results"))
       );
@@ -121,7 +85,6 @@ export default function HeroSection() {
     }, 380);
   };
 
-  // ── Slide animation styles ──────────────────────────────
   const heroSlide: React.CSSProperties =
     view === "leaving"
       ? {
@@ -154,71 +117,32 @@ export default function HeroSection() {
             "transform 0.38s cubic-bezier(0.4,0,0.2,1), opacity 0.38s ease",
         };
 
-  // ── Hero page ───────────────────────────────────────────
+  //  Hero page
   if (view === "hero" || view === "leaving") {
     return (
-      <main style={{ ...BASE, overflow: "hidden" }}>
+      <main className="min-h-screen bg-[#060e1a] text-slate-200 overflow-x-hidden overflow-hidden relative">
         <Background />
         <div
-          style={{
-            ...heroSlide,
-            position: "relative",
-            zIndex: 10,
-            padding: "80px 24px 96px",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-          }}
+          style={heroSlide}
+          className="relative z-10 px-6 pt-20 pb-24 flex flex-col items-center"
         >
           {/* Badge */}
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "6px 16px",
-              borderRadius: 9999,
-              border: "1px solid rgba(6,182,212,0.25)",
-              background: "rgba(6,182,212,0.08)",
-              marginBottom: 40,
-            }}
-          >
+          <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-cyan-500/25 bg-cyan-500/[0.08] mb-10">
             <span
+              className="w-2 h-2 rounded-full bg-green-400 inline-block"
               style={{
-                width: 8,
-                height: 8,
-                borderRadius: "50%",
-                background: "#4ade80",
                 boxShadow: "0 0 6px #4ade80",
-                display: "inline-block",
                 animation: "blink 2s infinite",
               }}
             />
-            <span
-              style={{
-                fontSize: 12,
-                color: "#cbd5e1",
-                letterSpacing: "0.05em",
-                fontWeight: 500,
-              }}
-            >
+            <span className="text-xs text-slate-300 tracking-widest font-medium">
               Competitor Intelligence Platform
             </span>
           </div>
 
           {/* Headline */}
-          <h1
-            style={{
-              textAlign: "center",
-              fontSize: "clamp(2.5rem, 8vw, 5rem)",
-              fontWeight: 800,
-              lineHeight: 1,
-              letterSpacing: "-0.03em",
-              marginBottom: 20,
-              marginTop: 0,
-            }}
-          >
-            <span style={{ color: "#fff" }}>Analyze </span>
+          <h1 className="text-center font-extrabold leading-none tracking-tight mb-5 mt-0 text-[clamp(2.5rem,8vw,5rem)]">
+            <span className="text-white">Analyze </span>
             <span
               style={{
                 background: "linear-gradient(90deg, #22d3ee, #3b82f6)",
@@ -232,21 +156,10 @@ export default function HeroSection() {
           </h1>
 
           {/* Sub */}
-          <p
-            style={{
-              color: "#94a3b8",
-              textAlign: "center",
-              fontSize: "1.1rem",
-              maxWidth: 480,
-              lineHeight: 1.7,
-              fontWeight: 300,
-              marginBottom: 48,
-              marginTop: 0,
-            }}
-          >
+          <p className="text-slate-400 text-center text-lg max-w-[480px] leading-relaxed font-light mb-12 mt-0">
             Paste a YouTube channel URL and instantly see which videos are
             crushing it.{" "}
-            <span style={{ color: "#cbd5e1" }}>
+            <span className="text-slate-300">
               Competitive analysis in seconds.
             </span>
           </p>
@@ -259,37 +172,13 @@ export default function HeroSection() {
 
           {/* API key warning */}
           {error?.includes("NEXT_PUBLIC_YOUTUBE_API_KEY") && (
-            <div
-              style={{
-                marginTop: 16,
-                padding: "12px 20px",
-                borderRadius: 12,
-                background: "rgba(234,179,8,0.08)",
-                border: "1px solid rgba(234,179,8,0.25)",
-                color: "#fde68a",
-                fontSize: 13,
-                maxWidth: 520,
-                width: "100%",
-              }}
-            >
+            <div className="mt-4 px-5 py-3 rounded-xl border border-yellow-500/25 bg-yellow-500/[0.08] text-yellow-200 text-sm max-w-[520px] w-full">
               <strong>Setup required:</strong> Copy{" "}
-              <code
-                style={{
-                  background: "rgba(255,255,255,0.1)",
-                  borderRadius: 4,
-                  padding: "1px 6px",
-                }}
-              >
+              <code className="bg-white/10 rounded px-1.5 py-0.5">
                 .env.local.example
               </code>{" "}
               to{" "}
-              <code
-                style={{
-                  background: "rgba(255,255,255,0.1)",
-                  borderRadius: 4,
-                  padding: "1px 6px",
-                }}
-              >
+              <code className="bg-white/10 rounded px-1.5 py-0.5">
                 .env.local
               </code>{" "}
               and add your{" "}
@@ -297,7 +186,7 @@ export default function HeroSection() {
                 href="https://console.cloud.google.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ color: "#38bdf8", textDecoration: "underline" }}
+                className="text-sky-400 underline"
               >
                 YouTube Data API v3 key
               </a>
@@ -307,51 +196,20 @@ export default function HeroSection() {
 
           {/* Generic error */}
           {error && !error.includes("NEXT_PUBLIC_YOUTUBE_API_KEY") && (
-            <div
-              style={{
-                marginTop: 24,
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                padding: "12px 20px",
-                borderRadius: 12,
-                background: "rgba(239,68,68,0.08)",
-                border: "1px solid rgba(239,68,68,0.2)",
-                color: "#fca5a5",
-                fontSize: 14,
-                maxWidth: 520,
-                width: "100%",
-              }}
-            >
-              <AlertCircle size={16} style={{ flexShrink: 0 }} />
+            <div className="mt-6 flex items-center gap-3 px-5 py-3 rounded-xl border border-red-500/20 bg-red-500/[0.08] text-red-300 text-sm max-w-[520px] w-full">
+              <AlertCircle size={16} className="shrink-0" />
               {error}
             </div>
           )}
 
-          {/* Loading skeleton */}
+          {/* Loading spinner */}
           {loading && (
-            <div
-              style={{
-                marginTop: 48,
-                width: "100%",
-                maxWidth: 640,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 16,
-              }}
-            >
+            <div className="mt-12 w-full max-w-[640px] flex flex-col items-center gap-4">
               <div
-                style={{
-                  width: 48,
-                  height: 48,
-                  borderRadius: "50%",
-                  border: "3px solid rgba(6,182,212,0.2)",
-                  borderTopColor: "#22d3ee",
-                  animation: "spin 0.8s linear infinite",
-                }}
+                className="w-12 h-12 rounded-full border-[3px] border-cyan-500/20 border-t-cyan-400"
+                style={{ animation: "spin 0.8s linear infinite" }}
               />
-              <p style={{ color: "#475569", fontSize: 14, margin: 0 }}>
+              <p className="text-slate-500 text-sm m-0">
                 Fetching channel data…
               </p>
             </div>
@@ -360,31 +218,15 @@ export default function HeroSection() {
           {/* Feature cards */}
           {!loading && (
             <div
+              className="mt-20 grid gap-4 w-full max-w-3xl"
               style={{
-                marginTop: 80,
-                display: "grid",
                 gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                gap: 16,
-                width: "100%",
-                maxWidth: 768,
               }}
             >
               {FEATURES.map(({ icon: Icon, title, desc, accent }) => (
                 <div
                   key={title}
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    gap: 12,
-                    padding: "24px 20px",
-                    borderRadius: 16,
-                    border: "1px solid rgba(255,255,255,0.06)",
-                    background: "rgba(13,27,46,0.5)",
-                    backdropFilter: "blur(8px)",
-                    transition: "border-color 0.2s",
-                    cursor: "default",
-                  }}
+                  className="flex flex-col items-center gap-3 p-6 rounded-2xl border border-white/[0.06] bg-[rgba(13,27,46,0.5)] backdrop-blur-sm cursor-default transition-colors duration-200"
                   onMouseEnter={(e) => {
                     (
                       e.currentTarget as HTMLElement
@@ -396,33 +238,15 @@ export default function HeroSection() {
                   }}
                 >
                   <div
-                    style={{
-                      padding: 12,
-                      borderRadius: 12,
-                      background: `${accent}18`,
-                    }}
+                    className="p-3 rounded-xl"
+                    style={{ background: `${accent}18` }}
                   >
                     <Icon size={20} style={{ color: accent }} />
                   </div>
-                  <p
-                    style={{
-                      color: "#f1f5f9",
-                      fontWeight: 600,
-                      fontSize: 14,
-                      margin: 0,
-                    }}
-                  >
+                  <p className="text-slate-100 font-semibold text-sm m-0">
                     {title}
                   </p>
-                  <p
-                    style={{
-                      color: "#64748b",
-                      fontSize: 12,
-                      textAlign: "center",
-                      lineHeight: 1.5,
-                      margin: 0,
-                    }}
-                  >
+                  <p className="text-slate-500 text-xs text-center leading-relaxed m-0">
                     {desc}
                   </p>
                 </div>
@@ -438,59 +262,21 @@ export default function HeroSection() {
     );
   }
 
-  // ── Results page ────────────────────────────────────────
+  //  Results page
   return (
-    <main style={{ ...BASE, overflow: "hidden" }}>
+    <main className="min-h-screen bg-[#060e1a] text-slate-200 overflow-x-hidden overflow-hidden relative">
       <Background />
 
-      {/* ── Sticky top nav bar ── */}
+      {/*  Sticky top nav bar  */}
       <div
-        style={{
-          position: "sticky",
-          top: 0,
-          zIndex: 50,
-          backdropFilter: "blur(16px)",
-          background: "rgba(6,14,26,0.85)",
-          borderBottom: "1px solid rgba(255,255,255,0.07)",
-          padding: "0 24px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          height: 60,
-          ...resultsSlide,
-        }}
+        style={resultsSlide}
+        className="sticky top-0 z-50 backdrop-blur-2xl bg-[rgba(6,14,26,0.85)] border-b border-white/[0.07] px-6 flex items-center justify-between h-[60px]"
       >
-        {/* Back button */}
+        {/* Back button — hidden on mobile */}
         <button
           onClick={handleBack}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 8,
-            background: "rgba(255,255,255,0.05)",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: 10,
-            padding: "7px 14px",
-            color: "#94a3b8",
-            fontSize: 13,
-            fontWeight: 500,
-            cursor: "pointer",
-            transition: "background 0.15s, color 0.15s, border-color 0.15s",
-          }}
-          onMouseEnter={(e) => {
-            const el = e.currentTarget as HTMLElement;
-            el.style.background = "rgba(6,182,212,0.1)";
-            el.style.color = "#22d3ee";
-            el.style.borderColor = "rgba(6,182,212,0.35)";
-          }}
-          onMouseLeave={(e) => {
-            const el = e.currentTarget as HTMLElement;
-            el.style.background = "rgba(255,255,255,0.05)";
-            el.style.color = "#94a3b8";
-            el.style.borderColor = "rgba(255,255,255,0.1)";
-          }}
+          className="hidden sm:flex items-center gap-2 bg-white/5 border border-white/10 rounded-[10px] px-3.5 py-1.5 text-slate-400 text-sm font-medium cursor-pointer transition-all duration-150 hover:bg-cyan-500/10 hover:text-cyan-400 hover:border-cyan-500/35"
         >
-          {/* Arrow SVG */}
           <svg
             width="14"
             height="14"
@@ -507,21 +293,16 @@ export default function HeroSection() {
         </button>
 
         {/* Wordmark */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 13, color: "#475569" }}>Analyzing</span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-slate-500">Analyzing</span>
           {results?.avatar && (
             <img
               src={results.avatar}
               alt=""
-              style={{
-                width: 24,
-                height: 24,
-                borderRadius: "50%",
-                border: "1px solid rgba(6,182,212,0.4)",
-              }}
+              className="w-6 h-6 rounded-full border border-cyan-500/40"
             />
           )}
-          <span style={{ fontSize: 13, fontWeight: 600, color: "#cbd5e1" }}>
+          <span className="text-sm font-semibold text-slate-300">
             {results?.name}
           </span>
         </div>
@@ -529,20 +310,10 @@ export default function HeroSection() {
         {/* New search button */}
         <button
           onClick={handleBack}
+          className="flex items-center gap-1.5 border border-cyan-500/25 rounded-[10px] px-3.5 py-1.5 text-cyan-400 text-sm font-medium cursor-pointer transition-all duration-150 hover:bg-cyan-500/25"
           style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 6,
             background:
               "linear-gradient(135deg, rgba(6,182,212,0.15), rgba(59,130,246,0.15))",
-            border: "1px solid rgba(6,182,212,0.25)",
-            borderRadius: 10,
-            padding: "7px 14px",
-            color: "#22d3ee",
-            fontSize: 13,
-            fontWeight: 500,
-            cursor: "pointer",
-            transition: "background 0.15s",
           }}
           onMouseEnter={(e) => {
             (e.currentTarget as HTMLElement).style.background =
@@ -570,15 +341,8 @@ export default function HeroSection() {
         </button>
       </div>
 
-      {/* ── Results body ── */}
-      <div
-        style={{
-          position: "relative",
-          zIndex: 10,
-          padding: "32px 24px 96px",
-          ...resultsSlide,
-        }}
-      >
+      {/*  Results body  */}
+      <div style={resultsSlide} className="relative z-10 px-6 pt-8 pb-24">
         {results && <ChannelResults data={results} />}
       </div>
     </main>
